@@ -461,6 +461,102 @@ def coverage(course, module, discover, ksb):
         click.echo()
 
 
+@cli.command()
+@click.argument('code')
+@click.option('--course', help='Course code (Uses current course if not specified)')
+@click.option('-m', '--module', type=int, required=True, help='Module number (1-7)')
+@click.option('-d', '--day',    type=int, required=True, help='Day number (1-5)')
+@click.option('-s', '--session',type=int, required=True, help='Session number (1-4)')
+@click.option('--notes', help='Session notes (how/why this KSB is covered)')
+@click.option('--remove', is_flag=True, help='Remove session mapping')
+def session(code, course, module, day, session, notes, remove):
+    """Map a KSB to a specific session"""
+    course_code = get_current_course(course)
+
+    if not course_code:
+        click.echo("No current course set. Use 'ulwazi course <DE5|DA4>' first.")
+        return
+
+    code = code.upper()
+
+    conn = get_db_connection()
+
+    # Check KSB exists
+    exists = conn.execute('''
+        SELECT 1 FROM ksbs
+        WHERE standard = ? AND code = ?
+    ''', (course_code, code)).fetchone()
+
+    if not exists:
+        click.echo(f"Error: {code} not found in {course_code}")
+        click.echo(f"Add it first with: ulwazi ksb {code} --add 'Description'")
+        conn.close()
+        return
+
+    # Check KSB is mapped to this module
+    module_mapped = conn.execute('''
+        SELECT 1 FROM module_ksbs
+        WHERE standard = ? AND ksb_code = ?
+        AND phase = 'Module' AND module_number = ?
+    ''', (course_code, code, module)).fetchone()
+
+    if not module_mapped:
+        click.echo(f"Error: {code} not mapped to M{module}")
+        click.echo(f"Map it first with: ulwazi map {code} -m {module}")
+        conn.close()
+        return
+
+    # Remove session mapping
+    if remove:
+        result = conn.execute('''
+            DELETE FROM session_ksbs
+            WHERE standard = ? AND ksb_code = ?
+            AND module_number = ? AND day_number = ? AND session_number = ?
+        ''', (course_code, code, module, day, session))
+
+        if result.rowcount == 0:
+            click.echo(f"Error: No session mapping found for {code} in M{module}D{day}S{session}")
+        else:
+            conn.commit()
+            click.echo(f"Session: Removed {code} from M{module}/D{day}S{session}")
+        conn.close()
+        return
+
+    # Update notes
+    if notes:
+        result = conn.execute('''
+            UPDATE session_ksbs
+            SET notes = ?
+            WHERE standard = ? AND ksb_code = ?
+            AND module_number = ? AND day_number = ? AND session_number = ?
+        ''', (notes, course_code, code, module, day, session))
+
+        if result.rowcount == 0:
+            click.echo(f"Error: No session mapping found for {code} in M{module}D{day}S{session}")
+            click.echo(f"Add it first with: ulwazi session {code} -m {module} -d {day} -s {session}")
+        else:
+            conn.commit()
+            click.echo(f"Session: Updated notes for {code} in M{module}/D{day}S{session}")
+        conn.close()
+        return
+
+    # Add session mapping (with optional notes)
+    try:
+        conn.execute('''
+            INSERT INTO session_ksbs 
+                (standard, ksb_code, module_number, day_number, session_number, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (course_code, code, module, day, session, notes or ''))
+        conn.commit()
+        notes_part = f" with notes" if notes else ""
+        click.echo(f"Session: Mapped {code} to M{module}/D{day}S{session}{notes_part}")
+    except sqlite3.IntegrityError:
+        click.echo(f"Error: {code} already mapped to M{module}/D{day}S{session}")
+        click.echo(f"Use --notes to modify notes or --remove to delete")
+
+    conn.close()
+
+
 if __name__ == '__main__':
     cli()
 
