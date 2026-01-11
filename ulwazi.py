@@ -100,7 +100,7 @@ def course(course_code):
     config['current_course'] = course_code
     save_config(config)
     
-    click.echo(f"Set current course to: {course_code}")
+    click.echo(f"Current course now set to: {course_code}")
 
 
 @cli.command()
@@ -225,7 +225,7 @@ def list(course, ksb):
     
     # Build query with LEFT JOIN to get module mappings
     query = '''
-        SELECT k.code, k.category, m.phase, m.module_number
+        SELECT k.code, k.category, k.description, m.phase, m.module_number
         FROM ksbs k
         LEFT OUTER JOIN module_ksbs m 
             ON k.standard = m.standard AND k.code = m.ksb_code
@@ -264,8 +264,9 @@ def list(course, ksb):
     # Group results by code
     ksb_data = defaultdict(lambda: {'category': None, 'mappings': []})
     
-    for code, category, phase, module_number in results:
+    for code, category, description, phase, module_number in results:
         ksb_data[code]['category'] = category
+        ksb_data[code]['description'] = description
         if phase:  # Only add if there's a mapping
             if phase == 'Discover':
                 ksb_data[code]['mappings'].append('Discover')
@@ -276,6 +277,7 @@ def list(course, ksb):
     current_category = None
     for code in sorted(ksb_data.keys(), key=lambda c: full_sort_key(c, ksb_data)):
         category = ksb_data[code]['category']
+        description = ksb_data[code]['description']
         mappings = ksb_data[code]['mappings']
         
         if category != current_category:
@@ -283,9 +285,9 @@ def list(course, ksb):
             current_category = category
         
         if mappings:
-            click.echo(f"  {code} - {', '.join(mappings)}")
+            click.echo(f"  {code:<3} - {', '.join(mappings)}")
         else:
-            click.echo(f"  {code}")
+            click.echo(f"  {code:<3} ~ {description[:100]}")
     
     click.echo()
 
