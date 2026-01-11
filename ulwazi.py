@@ -213,8 +213,9 @@ def ksb(code, course, description, update, remove):
 @cli.command()
 @click.option('--course', help='Course code (Uses current course if not specified)')
 @click.option('--ksb', help='Filter by category (k/s/b)')
-def list(course, ksb):
-    """List all KSBs for current course"""
+@click.option('--desc', 'show_desc', is_flag=True, help='Show KSB description')
+def show(course, ksb, show_desc):
+    """Show all KSBs for current course"""
     course_code = get_current_course(course)
     
     if not course_code:
@@ -232,7 +233,6 @@ def list(course, ksb):
         WHERE k.standard = ?
     '''
     params = [course_code]
-
 
     # Build query based on filter
     category = ''
@@ -256,7 +256,7 @@ def list(course, ksb):
     conn.close()
     
     if not results:
-        click.echo(f"No {category} KSBs found for {course_code}")
+        click.echo(f"List: No {category} KSBs found for {course_code}")
         return
     
     click.echo(f"\nCourse: {course_code}")
@@ -286,9 +286,10 @@ def list(course, ksb):
         
         if mappings:
             click.echo(f"  {code:<3} - {', '.join(mappings)}")
+            if show_desc: click.echo(f"        {description[:100]}\n")
         else:
             click.echo(f"  {code:<3} ~ {description[:100]}")
-    
+
     click.echo()
 
 
@@ -371,6 +372,93 @@ def map(code, course, module, discover, remove):
         click.echo(f"Error: {course_code} ~ {code} already mapped to {location}")
 
     conn.close()
+
+
+@cli.command()
+@click.option('--course', help='Course code (Uses current course if not specified)')
+@click.option('-m', '--module', type=int, help='Module number (1-7)')
+@click.option('--discover', is_flag=True, help='Show Discover phase KSBs')
+@click.option('--ksb', help='Filter by category (k/s/b)')
+def coverage(course, module, discover, ksb):
+    """Show KSB coverage for a module or Discover phase"""
+    course_code = get_current_course(course)
+    
+    if not course_code:
+        click.echo("No current course set. Use 'ulwazi course <DE5|DA4>' first.")
+        return
+    
+    # Validate: must specify either module or discover
+    if module and discover:
+        click.echo("Error: Specify either --module or --discover, not both")
+        return
+    
+    if not module and not discover:
+        click.echo("Error: Specify either --module <N> or --discover")
+        return
+    
+    # Determine phase and module_number
+    if discover:
+        phase = 'Discover'
+        module_number = None
+        location = 'Discover'
+    else:
+        phase = 'Module'
+        module_number = module
+        location = f'M{module}'
+    
+    conn = get_db_connection()
+    
+    # Build query
+    query = '''
+        SELECT k.code, k.category, k.description
+        FROM ksbs k
+        INNER JOIN module_ksbs m 
+            ON k.standard = m.standard AND k.code = m.ksb_code
+        WHERE k.standard = ? AND m.phase = ?
+    '''
+    params = [course_code, phase]
+    
+    if not discover:
+        query += ' AND m.module_number = ?'
+        params.append(module_number)
+    
+    if ksb:
+        category = {
+            'k': 'Knowledge',
+            's': 'Skill', 
+            'b': 'Behaviour'
+        }.get(ksb.lower())
+        
+        if not category:
+            click.echo("Use --ksb k, --ksb s, or --ksb b")
+            conn.close()
+            return
+        
+        query += ' AND k.category = ?'
+        params.append(category)
+    
+    query += ' ORDER BY k.category, k.code'
+    
+    results = conn.execute(query, params).fetchall()
+    conn.close()
+    
+    if not results:
+        click.echo(f"Coverage: No KSBs found for {course_code} {location}")
+        return
+    
+    click.echo(f"\nCourse: {course_code} - {location}\n")
+    
+    # Group by category
+    by_category = defaultdict(list)
+    for code, category, description in results:
+        by_category[category].append((code, description))
+    
+    # Display
+    for category in sorted(by_category.keys()):
+        click.echo(f"{category}:")
+        for code, description in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
+            click.echo(f"  {code}: {description[:100]}")
+        click.echo()
 
 
 if __name__ == '__main__':
