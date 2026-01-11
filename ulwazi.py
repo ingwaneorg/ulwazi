@@ -151,7 +151,7 @@ def ksb(code, course, description, update, remove):
                 VALUES (?, ?, ?, ?)
             ''', (course_code, code, category, description))
             conn.commit()
-            click.echo(f"Added {code} ({category}) to {course_code}")
+            click.echo(f"KSB: Added {code} ({category}) to {course_code}")
         except sqlite3.IntegrityError:
             click.echo(f"Error: {code} already exists in {course_code}")
             click.echo("Use --update to modify it")
@@ -170,7 +170,7 @@ def ksb(code, course, description, update, remove):
             click.echo(f"Error: {code} not found in {course_code}")
         else:
             conn.commit()
-            click.echo(f"Updated {code} description")
+            click.echo(f"KSB: Updated {code} description")
         conn.close()
         return
 
@@ -185,7 +185,7 @@ def ksb(code, course, description, update, remove):
             click.echo(f"Error: {code} not found in {course_code}")
         else:
             conn.commit()
-            click.echo(f"Removed {code} (and all mappings)")
+            click.echo(f"KSB: Removed {code} (and all mappings)")
         conn.close()
         return
 
@@ -197,16 +197,35 @@ def ksb(code, course, description, update, remove):
     ''', (course_code, code)).fetchone()
 
     if not result:
-        click.echo(f"{code} not found in {course_code}")
+        click.echo(f"KSB: {code} not found in {course_code}")
         conn.close()
         return
 
     code, category, desc = result
+    click.echo(f"\nCourse: {course_code}")
     click.echo(f"\n{code} ({category})")
     click.echo("-" * 50)
     click.echo(desc)
-    click.echo()
 
+    # Show module coverage
+    coverage_results = conn.execute('''
+        SELECT phase, module_number
+        FROM module_ksbs
+        WHERE standard = ? AND ksb_code = ?
+        ORDER BY phase, module_number
+    ''', (course_code, code)).fetchall()
+    
+    if coverage_results:
+        locations = []
+        for phase, module_number in coverage_results:
+            if phase == 'Discover':
+                locations.append('Discover')
+            else:
+                locations.append(f'M{module_number}')
+        click.echo(f"\nCovered in: {' / '.join(locations)}")
+    
+    click.echo()
+    
     conn.close()
 
 
@@ -377,87 +396,134 @@ def map(code, course, module, discover, remove):
 @cli.command()
 @click.option('--course', help='Course code (Uses current course if not specified)')
 @click.option('-m', '--module', type=int, help='Module number (1-7)')
+@click.option('-d', '--day',    type=int, help='Day number (1-5)')
+@click.option('-s', '--session',type=int, help='Session number (1-4)')
 @click.option('--discover', is_flag=True, help='Show Discover phase KSBs')
 @click.option('--ksb', help='Filter by category (k/s/b)')
-def coverage(course, module, discover, ksb):
-    """Show KSB coverage for a module or Discover phase"""
+@click.option('--notes', is_flag=True, help='Show session notes')
+def coverage(course, module, day, session, discover, ksb, notes):
+    """Show KSB coverage for a module, day, or session"""
     course_code = get_current_course(course)
-    
+
     if not course_code:
         click.echo("No current course set. Use 'ulwazi course <DE5|DA4>' first.")
         return
-    
-    # Validate: must specify either module or discover
-    if module and discover:
-        click.echo("Error: Specify either --module or --discover, not both")
+
+    # Validate options
+    if discover and (module or day or session):
+        click.echo("Error: --discover cannot be combined with -m, -d, or -s")
         return
-    
+
+    if session and not day:
+        click.echo("Error: -s/--session requires -d/--day")
+        return
+
+    if day and not module:
+        click.echo("Error: -d/--day requires -m/--module")
+        return
+
     if not module and not discover:
-        click.echo("Error: Specify either --module <N> or --discover")
+        click.echo("Error: Specify either -m/--module <N> or --discover")
         return
-    
-    # Determine phase and module_number
-    if discover:
-        phase = 'Discover'
-        module_number = None
-        location = 'Discover'
-    else:
-        phase = 'Module'
-        module_number = module
-        location = f'M{module}'
-    
+
     conn = get_db_connection()
-    
-    # Build query
-    query = '''
-        SELECT k.code, k.category, k.description
-        FROM ksbs k
-        INNER JOIN module_ksbs m 
-            ON k.standard = m.standard AND k.code = m.ksb_code
-        WHERE k.standard = ? AND m.phase = ?
-    '''
-    params = [course_code, phase]
-    
-    if not discover:
-        query += ' AND m.module_number = ?'
-        params.append(module_number)
-    
+
+    # Determine what level we're querying
+    if session:
+        # Session level
+        query = '''
+            SELECT k.code, k.category, k.description, s.notes
+            FROM ksbs k
+            INNER JOIN session_ksbs s
+                ON k.standard = s.standard AND k.code = s.ksb_code
+            WHERE k.standard = ? AND s.module_number = ?
+            AND s.day_number = ? AND s.session_number = ?
+        '''
+        params = [course_code, module, day, session]
+        location = f'M{module}/D{day}/S{session}'
+
+    elif day:
+        # Day level
+        query = '''
+            SELECT k.code, k.category, k.description, s.notes
+            FROM ksbs k
+            INNER JOIN session_ksbs s
+                ON k.standard = s.standard AND k.code = s.ksb_code
+            WHERE k.standard = ? AND s.module_number = ? AND s.day_number = ?
+        '''
+        params = [course_code, module, day]
+        location = f'M{module}/D{day}'
+
+    elif discover:
+        # Discover phase
+        query = '''
+            SELECT k.code, k.category, k.description
+            FROM ksbs k
+            INNER JOIN module_ksbs m
+                ON k.standard = m.standard AND k.code = m.ksb_code
+            WHERE k.standard = ? AND m.phase = 'Discover'
+        '''
+        params = [course_code]
+        location = 'Discover'
+
+    else:
+        # Module level
+        query = '''
+            SELECT k.code, k.category, k.description
+            FROM ksbs k
+            INNER JOIN module_ksbs m
+                ON k.standard = m.standard AND k.code = m.ksb_code
+            WHERE k.standard = ? AND m.phase = 'Module' AND m.module_number = ?
+        '''
+        params = [course_code, module]
+        location = f'M{module}'
+
+    # Add category filter if requested
     if ksb:
         category = {
             'k': 'Knowledge',
-            's': 'Skill', 
+            's': 'Skill',
             'b': 'Behaviour'
         }.get(ksb.lower())
-        
+
         if not category:
             click.echo("Use --ksb k, --ksb s, or --ksb b")
             conn.close()
             return
-        
+
         query += ' AND k.category = ?'
         params.append(category)
-    
+
     query += ' ORDER BY k.category, k.code'
-    
+
     results = conn.execute(query, params).fetchall()
     conn.close()
-    
+
     if not results:
         click.echo(f"Coverage: No KSBs found for {course_code} {location}")
         return
-    
+
     click.echo(f"\nCourse: {course_code} - {location}\n")
-    
+
     # Group by category
     by_category = defaultdict(list)
-    for code, category, description in results:
-        by_category[category].append((code, description))
-    
+
+    # Handle results based on whether we have notes column
+    if session or day:
+        for code, category, description, session_notes in results:
+            by_category[category].append((code, description, session_notes))
+    else:
+        for code, category, description in results:
+            by_category[category].append((code, description, None))
+
     # Display
     for category in sorted(by_category.keys()):
         click.echo(f"{category}:")
-        for code, description in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
+        for item in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
+            code, description, session_notes = item
             click.echo(f"  {code}: {description[:100]}")
+            if notes and session_notes:
+                click.echo(f"      Notes: {session_notes}")
         click.echo()
 
 
@@ -515,10 +581,10 @@ def session(code, course, module, day, session, notes, remove):
         ''', (course_code, code, module, day, session))
 
         if result.rowcount == 0:
-            click.echo(f"Error: No session mapping found for {code} in M{module}D{day}S{session}")
+            click.echo(f"Error: No session mapping found for {code} in M{module}/D{day}/S{session}")
         else:
             conn.commit()
-            click.echo(f"Session: Removed {code} from M{module}/D{day}S{session}")
+            click.echo(f"Session: Removed {code} from M{module}/D{day}/S{session}")
         conn.close()
         return
 
@@ -532,11 +598,11 @@ def session(code, course, module, day, session, notes, remove):
         ''', (notes, course_code, code, module, day, session))
 
         if result.rowcount == 0:
-            click.echo(f"Error: No session mapping found for {code} in M{module}D{day}S{session}")
+            click.echo(f"Error: No session mapping found for {code} in M{module}/D{day}/S{session}")
             click.echo(f"Add it first with: ulwazi session {code} -m {module} -d {day} -s {session}")
         else:
             conn.commit()
-            click.echo(f"Session: Updated notes for {code} in M{module}/D{day}S{session}")
+            click.echo(f"Session: Updated notes for {code} in M{module}/D{day}/S{session}")
         conn.close()
         return
 
@@ -549,9 +615,9 @@ def session(code, course, module, day, session, notes, remove):
         ''', (course_code, code, module, day, session, notes or ''))
         conn.commit()
         notes_part = f" with notes" if notes else ""
-        click.echo(f"Session: Mapped {code} to M{module}/D{day}S{session}{notes_part}")
+        click.echo(f"Session: Mapped {code} to M{module}/D{day}/S{session}{notes_part}")
     except sqlite3.IntegrityError:
-        click.echo(f"Error: {code} already mapped to M{module}/D{day}S{session}")
+        click.echo(f"Error: {code} already mapped to M{module}/D{day}/S{session}")
         click.echo(f"Use --notes to modify notes or --remove to delete")
 
     conn.close()
