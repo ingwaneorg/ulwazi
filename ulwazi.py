@@ -305,9 +305,9 @@ def show(course, ksb, show_desc):
         
         if mappings:
             click.echo(f"  {code:<3} - {', '.join(mappings)}")
-            if show_desc: click.echo(f"        {description[:100]}\n")
+            if show_desc: click.echo(f"        {description[:125]}\n")
         else:
-            click.echo(f"  {code:<3} ~ {description[:100]}")
+            click.echo(f"  {code:<3} ~ {description[:125]}")
 
     click.echo()
 
@@ -401,7 +401,8 @@ def map(code, course, module, discover, remove):
 @click.option('--discover', is_flag=True, help='Show Discover phase KSBs')
 @click.option('--ksb', help='Filter by category (k/s/b)')
 @click.option('--notes', is_flag=True, help='Show session notes')
-def coverage(course, module, day, session, discover, ksb, notes):
+@click.option('--markdown', is_flag=True,  help='Format the output with Markdown')
+def coverage(course, module, day, session, discover, ksb, notes, markdown):
     """Show KSB coverage for a module, day, or session"""
     course_code = get_current_course(course)
 
@@ -517,15 +518,18 @@ def coverage(course, module, day, session, discover, ksb, notes):
             by_category[category].append((code, description, None))
 
     # Display
-    for category in sorted(by_category.keys()):
-        click.echo(f"{category}:")
-        for item in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
-            code, description, session_notes = item
-            click.echo(f"  {code}: {description[:100]}")
-            if notes and session_notes:
-                click.echo(f"      Notes: {session_notes}")
-        click.echo()
+    if markdown:
+        pass
 
+    else:
+        for category in sorted(by_category.keys()):
+            click.echo(f"{category}:")
+            for item in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
+                code, description, session_notes = item
+                click.echo(f"  {code}: {description[:125]}")
+                if notes and session_notes:
+                    click.echo(f"      Notes: {session_notes}")
+            click.echo()
 
 @cli.command()
 @click.argument('code')
@@ -588,6 +592,20 @@ def session(code, course, module, day, session, notes, remove):
         conn.close()
         return
 
+    # Add session mapping
+    try:
+        conn.execute('''
+            INSERT INTO session_ksbs 
+                (standard, ksb_code, module_number, day_number, session_number, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (course_code, code, module, day, session, notes or ''))
+        conn.commit()
+        click.echo(f"Session: Mapped {code} to M{module}/D{day}/S{session}")
+    except sqlite3.IntegrityError:
+        if not notes:
+            click.echo(f"Error: {code} already mapped to M{module}/D{day}/S{session}")
+            click.echo(f"Use --notes to modify notes or --remove to delete")
+
     # Update notes
     if notes:
         result = conn.execute('''
@@ -603,22 +621,6 @@ def session(code, course, module, day, session, notes, remove):
         else:
             conn.commit()
             click.echo(f"Session: Updated notes for {code} in M{module}/D{day}/S{session}")
-        conn.close()
-        return
-
-    # Add session mapping (with optional notes)
-    try:
-        conn.execute('''
-            INSERT INTO session_ksbs 
-                (standard, ksb_code, module_number, day_number, session_number, notes)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (course_code, code, module, day, session, notes or ''))
-        conn.commit()
-        notes_part = f" with notes" if notes else ""
-        click.echo(f"Session: Mapped {code} to M{module}/D{day}/S{session}{notes_part}")
-    except sqlite3.IntegrityError:
-        click.echo(f"Error: {code} already mapped to M{module}/D{day}/S{session}")
-        click.echo(f"Use --notes to modify notes or --remove to delete")
 
     conn.close()
 
