@@ -233,7 +233,8 @@ def ksb(code, course, description, update, remove):
 @click.option('--course', help='Course code (Uses current course if not specified)')
 @click.option('--ksb', help='Filter by category (k/s/b)')
 @click.option('--desc', 'show_desc', is_flag=True, help='Show KSB description')
-def show(course, ksb, show_desc):
+@click.option('-t', '--trim', default=500, help='Trim the description to this length')
+def show(course, ksb, show_desc, trim):
     """Show all KSBs for current course"""
     course_code = get_current_course(course)
     
@@ -305,9 +306,9 @@ def show(course, ksb, show_desc):
         
         if mappings:
             click.echo(f"  {code:<3} - {', '.join(mappings)}")
-            if show_desc: click.echo(f"        {description[:125]}\n")
+            if show_desc: click.echo(f"        {description[:trim]}\n")
         else:
-            click.echo(f"  {code:<3} ~ {description[:125]}")
+            click.echo(f"  {code:<3} ~ {description[:trim]}")
 
     click.echo()
 
@@ -402,7 +403,8 @@ def map(code, course, module, discover, remove):
 @click.option('--ksb', help='Filter by category (k/s/b)')
 @click.option('--notes', is_flag=True, help='Show session notes')
 @click.option('--markdown', is_flag=True,  help='Format the output with Markdown')
-def coverage(course, module, day, session, discover, ksb, notes, markdown):
+@click.option('-t', '--trim', default=500, help='Trim the description to this length')
+def coverage(course, module, day, session, discover, ksb, notes, markdown, trim):
     """Show KSB coverage for a module, day, or session"""
     course_code = get_current_course(course)
 
@@ -526,7 +528,7 @@ def coverage(course, module, day, session, discover, ksb, notes, markdown):
             click.echo(f"{category}:")
             for item in sorted(by_category[category], key=lambda x: natural_sort_key(x[0])):
                 code, description, session_notes = item
-                click.echo(f"  {code}: {description[:125]}")
+                click.echo(f"  {code}: {description[:trim]}")
                 if notes and session_notes:
                     click.echo(f"      Notes: {session_notes}")
             click.echo()
