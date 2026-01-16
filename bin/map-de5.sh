@@ -1,3 +1,7 @@
+#!/bin/bash
+
+ulwazi course DE5
+
 ulwazi map K3 -m1
 ulwazi map K4 -m1
 ulwazi map K5 -m1
@@ -6,6 +10,7 @@ ulwazi map K16 -m1
 ulwazi map K19 -m1
 ulwazi map K20 -m1
 ulwazi map K27 -m1
+
 ulwazi map K1 -m2
 ulwazi map K2 -m2
 ulwazi map K3 -m2
@@ -13,6 +18,7 @@ ulwazi map K14 -m2
 ulwazi map K15 -m2
 ulwazi map K18 -m2
 ulwazi map K20 -m2
+
 ulwazi map K8 -m3
 ulwazi map K11 -m3
 ulwazi map K13 -m3
@@ -20,6 +26,7 @@ ulwazi map K14 -m3
 ulwazi map K17 -m3
 ulwazi map K18 -m3
 ulwazi map K20 -m3
+
 ulwazi map K6 -m4
 ulwazi map K7 -m4
 ulwazi map K9 -m4
@@ -29,26 +36,32 @@ ulwazi map K21 -m4
 ulwazi map K23 -m4
 ulwazi map K25 -m4
 ulwazi map K30 -m4
+
 ulwazi map K21 -m5
 ulwazi map K24 -m5
 ulwazi map K26 -m5
 ulwazi map K28 -m5
 ulwazi map K30 -m5
+
 ulwazi map K1 -m6
 ulwazi map K8 -m6
 ulwazi map K22 -m6
 ulwazi map K23 -m6
 ulwazi map K28 -m6
 ulwazi map K30 -m6
+
 ulwazi map K10 -m7
 ulwazi map K29 -m7
+
 ulwazi map S12 -m1
 ulwazi map S13 -m1
+
 ulwazi map S3 -m2
 ulwazi map S7 -m2
 ulwazi map S9 -m2
 ulwazi map S10 -m2
 ulwazi map S14 -m2
+
 ulwazi map S4 -m3
 ulwazi map S6 -m3
 ulwazi map S7 -m3
@@ -56,6 +69,7 @@ ulwazi map S8 -m3
 ulwazi map S9 -m3
 ulwazi map S15 -m3
 ulwazi map S16 -m3
+
 ulwazi map S1 -m4
 ulwazi map S2 -m4
 ulwazi map S3 -m4
@@ -66,6 +80,7 @@ ulwazi map S14 -m4
 ulwazi map S22 -m4
 ulwazi map S25 -m4
 ulwazi map S27 -m4
+
 ulwazi map S1 -m5
 ulwazi map S3 -m5
 ulwazi map S5 -m5
@@ -80,6 +95,7 @@ ulwazi map S23 -m5
 ulwazi map S24 -m5
 ulwazi map S26 -m5
 ulwazi map S27 -m5
+
 ulwazi map S4 -m6
 ulwazi map S6 -m6
 ulwazi map S8 -m6
@@ -96,6 +112,7 @@ ulwazi map S25 -m6
 ulwazi map S26 -m6
 ulwazi map S27 -m6
 ulwazi map S28 -m6
+
 ulwazi map S14 -m7
 ulwazi map S18 -m7
 ulwazi map S28 -m7

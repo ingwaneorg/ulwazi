@@ -1,0 +1,173 @@
+MODULE 1
+
+K1  Current relevant legislation and its application to the safe use of data
+K2  Organisational data and information security standards, policies and procedures relevant to data management activities
+K3  Principles of the data life cycle and the steps involved in carrying out routine data analysis tasks
+K4  Principles of data, including open and public data, administrative data, and research data
+K5  The differences between structured and unstructured data
+K8  Quality risks inherent in data and how to mitigate or resolve these
+K12 Organisational data architecture
+K15 The ethical aspects associated with the use and collation of data
+
+S1  Use data systems securely to meet requirements and in line with organisational procedures and legislation including principles of Privacy by Design
+S3  Apply principles of data classification within data analysis activity
+S5  Assess the impact on user experience and domain context on data analysis activity
+S6  Identify and escalate quality risks in data analysis with suggested mitigation or resolutions as appropriate
+S7  Undertake customer requirements analysis and implement findings in data analytics planning and outputs
+S12 Collaborate and communicate with a range of internal and external stakeholders using appropriate styles and behaviours to suit the audience
+S13 Use a range of analytical techniques such as data mining, time series forecasting and modelling techniques to identify and predict trends and patterns in data
+
+B1  Maintain a productive, professional and secure working environment
+B2  Show initiative, being resourceful when faced with a problem and taking responsibility for solving problems within their own remit
+B3  Work independently and collaboratively
+B5  Identify issues quickly, investigating and solving complex problems and applying appropriate solutions. Ensures the true root cause of any problem is found and a solution is identified which prevents recurrence.
+B6  Resilient - viewing obstacles as challenges and learning from failure.
+
+============================================================================================================================================
+MODULE 2 ~ Data Preparation and Visualisation 
+
+K1  Current relevant legislation and its application to the safe use of data 
+K2  Organisational data and information security standards, policies and procedures relevant to data management activities
+K3  Principles of the data life cycle and the steps involved in carrying out routine data analysis tasks
+K4  Principles of data, including open and public data, administrative data, and research data
+K7  Principles of user experience and domain context for data analytics
+K8  quality risks inherent in data and how to mitigate or resolve these
+K9  Principal approaches to defining customer requirements for data analysis
+K10 Approaches to combining data from different sources 
+K11 Approaches to organisational tools and methods for data analysis
+K12 Organisational data architecture 
+K13 Principles of statistics for analysing datasets
+K14 The principles of descriptive, predictive and prescriptive analytics
+
+S1  Use data systems securely to meet requirements and in line with organisational procedures and legislation including principles of Privacy by Design
+S2  Implement the stages of the data analysis lifecycle
+S4  Analyse data sets taking account of different data structures and database designs
+S5  Assess the impact on user experience and domain context on data analysis activity
+S6  Identify and escalate quality risks in data analysis with suggested mitigation or resolutions as appropriate
+S7  Undertake customer requirements analysis and implement findings in data analytics planning and outputs
+S8  Identify data sources and the risks and challenges to combination within data analysis activity
+S12 Collaborate and communicate with a range of internal and external stakeholders using appropriate styles and behaviours to suit the audience
+S14 Collate and interpret qualitative and quantitative data and convert into infographics, reports, tables, dashboards and graphs
+S15 Select and apply the most appropriate data tools to achieve the optimum outcome
+
+B1  Maintain a productive, professional and secure working environment
+B2  Show initiative, being resourceful when faced with a problem and taking responsibility for solving problems within their own remit
+B3  Work independently and collaboratively
+B5  Identify issues quickly, investigating and solving complex problems and applying appropriate solutions. Ensures the true root cause of any problem is found and a solution is identified which prevents recurrence.
+B6  Resilient - viewing obstacles as challenges and learning from failure.
+B7  Adaptable to changing contexts within the scope of a project, direction of the organisation or Data Analyst role.
+
+============================================================================================================================================
+MODULE 3 ~ Databases and SQL
+
+K5  The differences between structured and unstructured data
+K6  The fundamentals of data structures, database system design, implementation and maintenance
+K11 Approaches to organisational tools and methods for data analysis
+K12 Organisational data architecture
+
+S4  Analyse data sets taking account of different data structures and database designs
+S9  Apply organisational architecture requirements to data analysis activities
+
+B4  Logical and analytical
+B6  Resilient - viewing obstacles as challenges and learning from failure.
+B7  Adaptable to changing contexts within the scope of a project, direction of the organisation or Data Analyst role.
+
+============================================================================================================================================
+MODULE 4 ~ Programming for Data Analysis
+
+K11 Approaches to organisational tools and methods for data analysis
+
+S4  Analyse data sets taking account of different data structures and database designs.
+
+B4  Logical and analytical
+
+============================================================================================================================================
+MODULE 5 ~ Building Data Warehouses with Google Cloud
+
+K6  The fundamentals of data structures, database system design, implementation and maintenance
+K7  Principles of user experience and domain context for data analytics
+K8  Quality risks inherent in data and how to mitigate or resolve these
+K10 Approaches to combining data from different sources
+K11 Approaches to organisational tools and methods for data analysis
+K12 Organisational data architecture
+
+S1  Use data systems securely to meet requirements and in line with organisational procedures and legislation including principles of Privacy by Design
+S2  Implement the stages of the data analysis lifecycle
+S4  Analyse data sets taking account of different data structures and database designs
+S6  Identify and escalate quality risks in data analysis with suggested mitigation or resolutions as appropriate
+S8  Identify data sources and the risks and challenges to combination within data analysis activity
+S9  Apply organisational architecture requirements to data analysis activities
+S8  Identify data sources and the risks and challenges to combination within data analysis activity
+S9  Apply organizational architecture requirements to data analysis activities
+S10 Apply statistical methodologies to data analysis tasks
+S11 Apply predictive analytics in the collation and use of data
+S12 Collaborate and communicate with a range of internal and external stakeholders using appropriate styles and behaviours to suit the audience
+S13 Use a range of analytical techniques such as data mining, time series forecasting and modelling techniques to identify and predict trends and patterns in data
+S14 Collate and interpret qualitative and quantitative data and convert into infographics, reports, tables, dashboards and graphs
+S15 Select and apply the most appropriate data tools to achieve the optimum outcome
+
+B1  maintain a productive, professional and secure working environment
+B2  show initiative, being resourceful when faced with a problem and taking responsibility for solving problems within their own remit
+B3  work independently and collaboratively
+B4  logical and analytical
+B5  identify issues quickly, investigating and solving complex problems and applying appropriate solutions. Ensures the true root cause of any problem is found and a solution is identified which prevents recurrence.
+B6  resilient - viewing obstacles as challenges and learning from failure.
+B7  adaptable to changing contexts within the scope of a project, direction of the organisation or Data Analyst role.
+
+============================================================================================================================================
+MODULE 6 ~ Data Analysis and Machine Learning
+
+K3  principles of the data life cycle and the steps involved in carrying out routine data analysis tasks
+K11 approaches to organisational tools and methods for data analysis
+K13 principles of statistics for analysing datasets
+K14 the principles of descriptive, predictive and prescriptive analytics
+K15 the ethical aspects associated with the use and collation of data
+
+S2  implement the stages of the data analysis lifecycle
+S3  apply principles of data classification within data analysis activity
+S4  analyse data sets taking account of different data
+S10 apply statistical methodologies to data analysis tasks
+S11 apply predictive analytics in the collation and use of data
+S12 collaborate and communicate with a range of internal and external stakeholders using appropriate
+S13 use a range of analytical techniques such as data mining, time series forecasting and modelling techniques to identify and predict trends and patterns in data
+
+B2  show initiative, being resourceful when faced with a problem and taking responsibility for solving problems within their own remit
+B4  logical and analytical
+B5  identify issues quickly, investigating and solving complex problems and applying appropriate solutions. Ensures the true root cause of any problem is found and a solution is identified which prevents recurrence.
+B6  resilient - viewing obstacles as challenges and learning from failure.
+B7  adaptable to changing contexts within the scope of a project, direction of the organisation or Data Analyst role.
+
+============================================================================================================================================
+MODULE 7 ~ Machine Learning in Google Cloud Platform
+
+K1  current relevant legislation and its application to the safe use of data
+K2  organisational data and information security standards, policies and procedures relevant to data management activities
+K11 approaches to organisational tools and methods for data analysis
+K12 organisational data architecture
+K13 principles of statistics for analysing datasets
+K14 the principles of descriptive, predictive and prescriptive analytics
+K15 the ethical aspects associated with the use and collation of data
+
+S1  use data systems securely to meet requirements and in line with organisational procedures and legislation including principles of Privacy by Design
+S2  implement the stages of the data analysis lifecycle
+S4  analyse data sets taking account of different data structures and database designs
+S5  assess the impact on user experience and domain context on data analysis activity
+S8  identify data sources and the risks and challenges to combination within data analysis activity
+S9  apply organizational architecture requirements to data analysis activities
+S10 apply statistical methodologies to data analysis tasks
+S11 apply predictive analytics in the collation and use of data
+S13 use a range of analytical techniques such as data mining, time series forecasting and modelling techniques to identify and predict trends and patterns in data
+S14 collate and interpret qualitative and quantitative data and convert into infographics, reports, tables, dashboards and graphs
+S15 select and apply the most appropriate data tools to achieve the optimum outcome
+
+B1  maintain a productive, professional and secure working environment
+B2  show initiative, being resourceful when faced with a problem and taking responsibility for solving problems within their own remit
+B3  work independently and collaboratively
+B4  logical and analytical
+B5  identify issues quickly, investigating and solving complex problems and applying appropriate solutions. Ensures the true root cause of any problem is found and a solution is identified which prevents recurrence.
+B6  resilient - viewing obstacles as challenges and learning from failure.
+B7  adaptable to changing contexts within the scope of a project, direction of the organisation or Data Analyst role.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
